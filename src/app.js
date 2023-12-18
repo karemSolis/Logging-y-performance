@@ -26,7 +26,7 @@ import __dirname from "./utils.js";
 
 import config from "./config/config.js";
 import usersDao from "./DAO/classes/users.dao.js";
-
+import logger from "./controllers/logger.js";
 
 
 
@@ -43,15 +43,15 @@ app.use(express.urlencoded({ extended: false }));
 //---------------------------------------------------------------
 
 app.listen(config.port, () => {
-    console.log(`Servidor corriendo en el puerto ${config.port}`);
+    logger.info(`Servidor corriendo en el puerto ${config.port}`);
 });
 
 mongoose.connect(config.mongoUrl)
 .then(()=> {
-  console.log("Conectado a atlas")
+    logger.info("Conectado a atlas")
 })
 .catch(error => {
-  console.error("No se puede conectar con Atlas, error"+ error)
+    logger.info("No se puede conectar con Atlas, error"+ error)
 })
 
 
@@ -144,7 +144,7 @@ app.get("/products/:id", async (req, res) => {
 app.get("/carts", async (req, res) => {
   const cart = await carts.readCarts(); 
   const productsInCart = await carts.getProductsForCart(cart.products); 
-  console.log("Datos del carrito:", cart);
+  logger.info("Datos del carrito:", cart);
   res.render("carts", { cart, productsInCart });
 });
 //RECORDAR INTEGRAR EL TEMA DE ID A ESTE MIDDLEWARS

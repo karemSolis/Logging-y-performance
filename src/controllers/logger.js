@@ -6,7 +6,11 @@ const devLogger = winston.createLogger({
         winston.format.colorize(),
         winston.format.simple()
     ),
-    transports:[new winston.transports.Console()],
+    transports: [
+        new winston.transports.Console({ level: 'debug' }),
+        new winston.transports.File({ filename: 'errors.log', level: 'error' })
+    ],
+    
 })
 
 const prodLogger = winston.createLogger({
@@ -15,7 +19,11 @@ const prodLogger = winston.createLogger({
         winston.format.colorize(),
         winston.format.simple()
     ),
-    transports:[new winston.transports.File({ filename: 'logfile.log' })],
+    transports: [
+        new winston.transports.File({ filename: 'logfileprod.log', level: 'info' }),
+        new winston.transports.File({ filename: 'errors.log', level: 'error' })
+    ],
+
 })
 
 const logger = (process.env.ENV === "Production" ? prodLogger : devLogger)

@@ -1,7 +1,8 @@
 import { generateToken, authToken, isValidPassword, createHash } from "../utils.js";
 import { Router } from "express";
-
 import usersDao from "../DAO/classes/users.dao.js";
+import logger from "../controllers/logger.js"
+
 const jwtEstrategy = Router();
 
 const UsersDao = new usersDao()
@@ -35,17 +36,17 @@ jwtEstrategy.post("/login", async (req, res) => {
 
     // Validar si el email y la contraseña corresponden a un usuario
     const user = await UsersDao.findEmail({ email });
-    console.log('Usuario encontrado:', user);
-    console.log('Contraseña proporcionada:', password);
+    logger.debug('Usuario encontrado:', user);
+    logger.debug('Contraseña proporcionada:', password);
     // Si no existe el usuario, retornar un error
     if (!user || !isValidPassword(user, password)) {
-        console.log("Contraseña válida:", isValidPassword(user, password));
+        logger.debug("Contraseña válida:", isValidPassword(user, password));
         return res.status(400).send({ status: "error", error: "Credenciales inválidas" });
     }
 
     // Crear un token y enviar la respuesta
     const access_token = generateToken(user);
-    console.log("Token generado:", access_token);
+    logger.debug("Token generado:", access_token);
     res.send({ status: "success", access_token });
 });
 

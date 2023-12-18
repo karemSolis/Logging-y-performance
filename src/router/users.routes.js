@@ -10,7 +10,7 @@ import { getUsers, getUserById, saveUser } from "../controllers/users.controller
 import {generateUser} from "../utils.js"
 import { generateUserErrorInfo } from "../services/errors/info.js";
 import EErrors from "../services/errors/enums.js";
-
+import logger from "../controllers/logger.js"
 
 
 const userRouter = Router();
@@ -31,10 +31,10 @@ userRouter.post("/formRegister", passport.authenticate('formRegister',{failureRe
         code:EErrors.INVALID_TYPES_ERROR
         }) 
 //--------------------------------------------------------------------
-        
+        logger.http(`Solicitud POST a /formRegister:: ${JSON.stringify(req.body)}`);
         res.redirect("/login")
-    } catch (error) 
-    {
+    } catch (error) {
+        logger.error(`Error al procesar solicitud /formRegister: ${error.message}`);
         res.status(500).send("Error al acceder al registrar: " + error.message);
     }
 })
@@ -44,7 +44,7 @@ userRouter.post("/formRegister", passport.authenticate('formRegister',{failureRe
 
 
 userRouter.get("/failformRegister",async(req,res)=>{
-    console.log("Falló el registro")
+    logger.debug("Falló el registro")
     res.send({error: "Error"})
 })
 
@@ -52,8 +52,11 @@ userRouter.get("/failformRegister",async(req,res)=>{
 userRouter.post("/login", passport.authenticate('login',{failureRedirect:'/faillogin'}), async (req, res) => {
     try 
      {
-        if(!req.user) return res.status(400).send({status:"error", error: "Credenciales no validas"})
-        
+        logger.http(`Intento de inicio de sesión fallido: ${JSON.stringify(req.body)}`);
+        if(!req.user)
+        return res.status(400).send({status:"error", error: "Credenciales no validas"})
+
+        logger.http(`Acceso exitoso: ${JSON.stringify(req.user)}`);
         if(req.user.rol === 'admin'){
             req.session.emailUsuario = req.user.email
             req.session.nomUsuario = req.user.first_name
@@ -62,6 +65,7 @@ userRouter.post("/login", passport.authenticate('login',{failureRedirect:'/faill
             res.redirect("/userProfile")
         }
         else{
+            logger.http(`Usuario normal que inició sesión: ${req.user.email}`);
             req.session.emailUsuario = req.user.email           
             req.session.rolUsuario = req.user.rol
             res.redirect("/products")
@@ -82,14 +86,14 @@ userRouter.get("/faillogin", (req, res)=>{  //MODIFIQUÉ ACÁ REF.LOGIN
 
 
 userRouter.get("/userProfile", (req, res) => {
-    console.log("Acceso a la ruta /userProfile");
-    console.log("Valores de sesión:", req.session);
+    logger.info("Acceso a la ruta /userProfile");
+    logger.info("Valores de sesión:", req.session);
 
     if (req.session.rolUsuario === 'admin') {
-        console.log("Redirigiendo a /login debido a rol de administrador");
+        logger.info("Redirigiendo a /login debido a rol de administrador");
         res.redirect("/login");
     } else {
-        console.log("Renderizando la vista de perfil");
+        logger.info("Renderizando la vista de perfil");
         res.render("userProfile", {
             title: "Perfil de Usuario",
             first_name: req.session.nomUsuario,
@@ -136,7 +140,7 @@ userRouter.get("/mockingproducts", async (req, res) => {
         users.push(generateUser())
     }
 
-    // console.log(users)
+    // logger.info(users)
 
     res.send({ status: "success", payload: users })
 })

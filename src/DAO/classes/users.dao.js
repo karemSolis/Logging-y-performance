@@ -1,7 +1,7 @@
 
 import { createHash, isValidPassword } from "../../utils.js";
 import usersModel from "../models/user.js";
-
+import logger from "../../controllers/logger.js"
 
 class usersDao {
     constructor() {
@@ -14,15 +14,15 @@ class usersDao {
             const { first_name, last_name, email, age, rol } = user;
             const password = user.password; // Aquí se obtiene la contraseña
 
-            console.log("Intentando agregar nuevo usuario:", user);
+            logger.debug("Intentando agregar nuevo usuario:", user);
 
             const newUser = await this.userModel.create({ first_name, last_name, email, age, rol, password });
             await newUser.save();
 
-            console.log("Usuario creado correctamente:", newUser);
+            logger.debug("Usuario creado correctamente:", newUser);
             return 'Usuario creado correctamente';
         } catch (error) {
-            console.error('Error al crear el usuario:', error);
+            logger.error('Error al crear el usuario:', error);
             return 'Error al crear el usuario';
         }
     }
@@ -44,7 +44,7 @@ class usersDao {
             userToUpdate.set(updatedUser);
 
             await userToUpdate.save();
-            console.log("Usuario actualizado correctamente:", userToUpdate);
+            logger.debug("Usuario actualizado correctamente:", userToUpdate);
             return 'Usuario actualizado correctamente';
         } catch (error) {
             console.error('Error al actualizar el usuario:', error);
@@ -57,7 +57,7 @@ class usersDao {
     async getUsers() {
         try {
             const users = await this.userModel.find({});
-            console.log("Usuarios obtenidos:", users);
+            logger.debug("Usuarios obtenidos:", users);
             return users;
         } catch (error) {
             console.error('Error al obtener usuarios:', error);
@@ -74,7 +74,7 @@ class usersDao {
 
                 return 'Usuario no encontrado';
             }
-            console.log("Usuario obtenido por ID:", user);
+            logger.debug("Usuario obtenido por ID:", user);
             return user;
         } catch (error) {
             console.error('Error al obtener usuario por ID:', error);
@@ -92,10 +92,10 @@ class usersDao {
             }
 
             await user.remove();
-            console.log("Usuario eliminado correctamente:", user);
+            logger.debug("Usuario eliminado correctamente:", user);
             return 'Usuario eliminado correctamente';
         } catch (error) {
-            console.error('Error al eliminar el usuario:', error);
+            logger.error('Error al eliminar el usuario:', error);
             return 'Error al eliminar el usuario: ' + error.message;
         }
     }
@@ -110,7 +110,7 @@ class usersDao {
 
             return user;
         } catch (error) {
-            console.error('Error al validar usuario', error);
+            logger.error('Error al validar usuario', error);
             return 'Error al obtener el usuario';
         }
     }
@@ -118,7 +118,7 @@ class usersDao {
     async findEmail(param) {
         try {
             const user = await this.userModel.findOne(param)
-            console.log('Usuario encontrado:', user);
+            logger.debug('Usuario encontrado:', user);
             return user;
         } catch (error) {
             console.error('Error al validar usuario', error);
@@ -131,7 +131,7 @@ class usersDao {
             let result = await this.userModel.create(user)
             return result
         } catch (error) {
-            console.log(error)
+            logger.error(error)
             return null
         }
     }

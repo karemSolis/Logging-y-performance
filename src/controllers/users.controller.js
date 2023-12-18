@@ -48,7 +48,7 @@ export const generateUser = async (req, res) => {
         products.push(await generateProduct());
     }
 
-    console.log(products);
+    logger.debug(products);
 
     return res.send({
         name: faker.person.firstName(),

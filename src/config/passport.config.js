@@ -4,6 +4,7 @@ import { createHash, isValidPassword } from "../utils.js"
 import passport from "passport"
 import local from "passport-local"
 import usersDao from "../DAO/classes/users.dao.js"
+import logger from "../controllers/logger.js"
 
 const localStrategy = local.Strategy
 
@@ -18,7 +19,7 @@ const initializaPassport = () => {
 
             //if (user !== undefined) {
             if (user) {
-                console.log("El usuario ya está registrado");
+                logger.debug("El usuario ya está registrado");
                 return done(null, false);
             }
 
@@ -33,7 +34,7 @@ const initializaPassport = () => {
                 return done(null, false);
             }
         } catch (error) {
-            console.error('Error al registrar usuario:', error);
+            logger.error('Error al registrar usuario:', error);
             return done(error);
         }
     }))
@@ -54,13 +55,13 @@ const initializaPassport = () => {
     try {
         const user = await UsersDao.findEmail({ email: username });
         if (!user) {
-            console.log("No se encuentra al usuario o no existe");
+            logger.debug("No se encuentra al usuario o no existe");
             return done(null, false);
         }
         
 
         if (!isValidPassword(user, password)) {
-            console.log("La contraseña no es válida");
+            logger.debug("La contraseña no es válida");
             return done(null, false);
         }
         
@@ -86,7 +87,7 @@ const initializaPassport = () => {
          //profile: objeto que contiene la información del perfil del usuario obtenida en github, el profile.__json.email se usa para acceder al correo electrónico del usuario.
          //done:se utiliza para indicar a passport si la utentificación fue exitosa y proporcionar información sobre el usuario autentificado. 
          try {
-             console.log(profile)
+             logger.debug(profile)
          ////Verificación del Usuario:
              let user = await UsersDao.findEmail({ email: profile.__json.email }) //busca en la base de datos si ya existe un usuario con la dirección de correo electrónico proporcionada por GitHub.
              if(!user){ //si usuario no existe 

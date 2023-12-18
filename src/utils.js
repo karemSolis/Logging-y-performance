@@ -3,13 +3,14 @@ import jwt from 'jsonwebtoken'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
 import {faker} from '@faker-js/faker'
+import logger from './controllers/logger.js'
 
 
 
 export const createHash = password => bcrypt.hashSync(password, bcrypt.genSaltSync(10))
 
 export const isValidPassword = (user, password) => {
-    console.log('Ejecutando isValidPassword');
+    logger.info('Ejecutando isValidPassword');
     return bcrypt.compareSync(password, user.password || ''); // Agregamos el manejo para contraseña nula
 };
 
@@ -49,7 +50,7 @@ export const generateUser = async (req, res) => {
         products.push(await generateProduct());
     }
 
-    console.log(products);
+   logger.debug(products);
 
     return res.send({
         name: faker.person.firstName(),
@@ -78,7 +79,7 @@ export const generateUser = () => {
     for (let i = 0; i < 10; i++) {
         products.push(generateProduct())
     }
-    console.log(products)
+    logger.debug(products)
 
     return {
         name: faker.person.firstName(),
